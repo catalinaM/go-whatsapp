@@ -19,8 +19,10 @@ func (wac *Conn) SetCloseGroup(jid, userID string, close bool) (<-chan string, e
                         "restrict", userID, close,
                 },
                 }}
-                fmt.Println(data)
-        return wac.setGroup("restrict", jid, "true", nil)
+
+				fmt.Println(data)
+				fmt.Println("LIB-----")
+        return wac.setGroup("restrict", jid, "", nil)
                 //      return wac.writeJson(data2)
 }
 
