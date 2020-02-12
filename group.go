@@ -12,15 +12,19 @@ func (wac *Conn) GetGroupMetaData(jid string) (<-chan string, error) {
 }
 
 func (wac *Conn) SetCloseGroup(jid, userID string, close bool) (<-chan string, error) {
-	data := []interface{}{"Chat", map[string]interface{}{
-		"id": jid,
-		"cmd": "action",
-		"data": []interface{}{
-			"restrict", userID, close,
-		},
-		}}
-	return wac.writeJson(data)
+        data := []interface{}{"Chat", map[string]interface{}{
+                "id": jid,
+                "cmd": "action",
+                "data": []interface{}{
+                        "restrict", userID, close,
+                },
+                }}
+                fmt.Println(data)
+        return wac.setGroup("restrict", jid, "true", nil)
+                //      return wac.writeJson(data2)
 }
+
+
 
 func (wac *Conn) CreateGroup(subject string, participants []string) (<-chan string, error) {
 	return wac.setGroup("create", "", subject, participants)
