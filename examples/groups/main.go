@@ -7,8 +7,6 @@ import (
 	"os"
 	"time"
 
-	// "github.com/catalinaM/go-whatsapp/binary/proto"
-
 	qrcodeTerminal "github.com/Baozisoftware/qrcode-terminal-go"
 	"github.com/catalinaM/go-whatsapp"
 )
@@ -27,8 +25,7 @@ func main() {
 		return
 	}
 
-	// <-time.After(3 * time.Second)
-	ch, err := wac.GetGroupMetaData("@g.us")
+ ch, err := wac.GetGroupMetaData("....@g.us")
  var response map[string]interface{}
 
 	err = json.Unmarshal([]byte(<-ch), &response)
@@ -39,16 +36,7 @@ func main() {
 
 
 	fmt.Println(response)
-	wac.GroupAnnouceFlag("@g.us", "@c.us", true)
-// 	var response1 map[string]interface{}
-// 	fmt.Println("back")
-// 	 err = json.Unmarshal([]byte(<-ch1), &response1)
-// fmt.Println("gata")
-// 	 if err1 != nil {
-// 		 fmt.Println("error decoding response message: %v\n", err)
-// 	 }
-
-	 fmt.Println(response1)
+	wac.GroupAnnoucementSettings("...@g.us", "...@c.us", false)
 }
 
 func login(wac *whatsapp.Conn) error {

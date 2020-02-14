@@ -13,14 +13,14 @@ func (wac *Conn) GetGroupMetaData(jid string) (<-chan string, error) {
 	return wac.writeJson(data)
 }
 
-func (wac *Conn) GroupAnnouceFlag(jid string, cid string, close bool) (<-chan string, error) {
+func (wac *Conn) GroupAnnoucementSettings(jid string, cid string, close bool) {
 		ts := time.Now().Unix()
 		tag := fmt.Sprintf("%d.--%d", ts, wac.msgCount)
 
 		a := binary.Node{
 			Description: "announcement",
 			Attributes: map[string]string{
-				"value": "true",
+				"value": strconv.FormatBool(close),
 			},
 			Content: nil,
 		}
@@ -33,9 +33,9 @@ func (wac *Conn) GroupAnnouceFlag(jid string, cid string, close bool) (<-chan st
 				"id": tag,
 				"jid": jid,
 				"type":   "prop",
-				"author": cid,
+				"author": wac.session.Wid,
 			},
-			Content: []interface{}{a},
+			Content: []binary.Node{a},
 		}
 
 		n := binary.Node{
@@ -47,64 +47,8 @@ func (wac *Conn) GroupAnnouceFlag(jid string, cid string, close bool) (<-chan st
 			Content: []interface{}{g},
 		}
 
-		ch, err := wac.writeBinary(n, group, ignore, tag)
-		var response map[string]interface{}
-		fmt.Println(n)
-fmt.Println(err)
-
-						select {
-						case r := <-ch:
-							if err := json.Unmarshal([]byte(r), &response); err != nil {
-							 fmt.Println("error decoding response message: %v\n", err)
-							}
-						case <-time.After(wac.msgTimeout):
-							 fmt.Println("rrr request timed out")
-						}
-						//
-						// if int(response["status"].(float64)) != 200 {
-						// 	fmt.Errorf("request responded with %d", response["status"])
-						// }
-		return ch,err
-
+		wac.writeBinary(n, group, ignore, tag)
 }
-//         // data := []interface{}{"Chat", map[string]interface{}{
-//         //         "id": jid,
-//         //         "cmd": "action",
-//         //         "data": []interface{}{
-//         //                 "restrict", userID, close,
-//         //         },
-//         //         }}
-// 				//
-// 				// fmt.Println(data)
-// 				// fmt.Println("LIB-----")
-//         // return wac.setGroup("restrict", jid, "", nil)
-//
-//         //         //      return wac.writeJson(data2)
-// 				request := []interface{}{"group", "inviteCode", jid}
-// 				ch, err := wac.writeJson(request)
-// 				if err != nil {
-// 					return "", err
-// 				}
-// 				fmt.Println("inside")
-//
-// 				fmt.Println(ch)
-// 				var response map[string]interface{}
-//
-// 				select {
-// 				case r := <-ch:
-// 					if err := json.Unmarshal([]byte(r), &response); err != nil {
-// 						return "", fmt.Errorf("error decoding response message: %v\n", err)
-// 					}
-// 				case <-time.After(wac.msgTimeout):
-// 					return "", fmt.Errorf("request timed out")
-// 				}
-//
-// 				if int(response["status"].(float64)) != 200 {
-// 					return "", fmt.Errorf("request responded with %d", response["status"])
-// 				}
-// fmt.Println(response)
-// 				return response["code"].(string), nil
-// }
 
 func (wac *Conn) CreateGroup(subject string, participants []string) (<-chan string, error) {
 	return wac.setGroup("create", "", subject, participants)
