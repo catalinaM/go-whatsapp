@@ -28,7 +28,7 @@ func main() {
 	}
 
 	// <-time.After(3 * time.Second)
-	ch, err := wac.GetGroupMetaData("....@g.us")
+	ch, err := wac.GetGroupMetaData("@g.us")
  var response map[string]interface{}
 
 	err = json.Unmarshal([]byte(<-ch), &response)
@@ -39,15 +39,14 @@ func main() {
 
 
 	fmt.Println(response)
-	ch1,err1 := wac.CloseGroup(".....@g.us", ".....@c.us", true)
-	var response1 map[string]interface{}
-	fmt.Println("back")
-	 err = json.Unmarshal([]byte(<-ch1), &response1)
-fmt.Println("gata")
-	 if err1 != nil {
-		 fmt.Println("error decoding response message: %v\n", err)
-	 }
-
+	wac.GroupAnnouceFlag("@g.us", "@c.us", true)
+// 	var response1 map[string]interface{}
+// 	fmt.Println("back")
+// 	 err = json.Unmarshal([]byte(<-ch1), &response1)
+// fmt.Println("gata")
+// 	 if err1 != nil {
+// 		 fmt.Println("error decoding response message: %v\n", err)
+// 	 }
 
 	 fmt.Println(response1)
 }

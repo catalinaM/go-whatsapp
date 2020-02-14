@@ -13,33 +13,30 @@ func (wac *Conn) GetGroupMetaData(jid string) (<-chan string, error) {
 	return wac.writeJson(data)
 }
 
-func (wac *Conn) CloseGroup(jid, userID string, close bool) (<-chan string, error) {
-	fmt.Println("st")
-
+func (wac *Conn) GroupAnnouceFlag(jid string, cid string, close bool) (<-chan string, error) {
 		ts := time.Now().Unix()
 		tag := fmt.Sprintf("%d.--%d", ts, wac.msgCount)
-		fmt.Println("inside")
 
-		//TODO: get proto or improve encoder to handle []interface{}
-		//
-		// p := buildParticipantNodes(participants)
+		a := binary.Node{
+			Description: "announcement",
+			Attributes: map[string]string{
+				"value": "true",
+			},
+			Content: nil,
+		}
 
-		fmt.Println("inside")
-		g := binary.Node{
+		fmt.Println(wac.session.Wid)
+
+ 		g := binary.Node{
 			Description: "group",
 			Attributes: map[string]string{
-				"author": wac.session.Wid,
-				"id":     tag,
-				// "type":   "announce",
-				"announce": "false",
+				"id": tag,
 				"jid": jid,
-				// "announce": strconv.FormatBool(close),
+				"type":   "prop",
+				"author": cid,
 			},
-			// Content: nil,
+			Content: []interface{}{a},
 		}
-		// g.Attributes["subject"] = "test test3"
-
-		fmt.Println("inside")
 
 		n := binary.Node{
 			Description: "action",
@@ -49,34 +46,25 @@ func (wac *Conn) CloseGroup(jid, userID string, close bool) (<-chan string, erro
 			},
 			Content: []interface{}{g},
 		}
-		fmt.Println("inside last")
 
-		return wac.writeBinary(n, group, ignore, tag)
+		ch, err := wac.writeBinary(n, group, ignore, tag)
+		var response map[string]interface{}
+		fmt.Println(n)
+fmt.Println(err)
 
-		// if err != nil {
-		// 	return "", err
-		// }
-		// fmt.Println(err)
-		//
-		// fmt.Println(ch)
-		// var response map[string]interface{}
-		//
-		// select {
-		// case r := <-ch:
-		// 	if err := json.Unmarshal([]byte(r), &response); err != nil {
-		// 		fmt.Println("error decoding response message: %v\n", err)
-		// 		return "", fmt.Errorf("error decoding response message: %v\n", err)
-		// 	}
-		// case <-time.After(wac.msgTimeout):
-		// 		fmt.Println("request timed out")
-		// 	return "", fmt.Errorf("request timed out")
-		// }
-		// //
-		// // if int(response["status"].(float64)) != 200 {
-		// // 	return "", fmt.Errorf("request responded with %d", response["status"])
-		// // }
-		// fmt.Println(response)
-		// return response["code"].(string), nil
+						select {
+						case r := <-ch:
+							if err := json.Unmarshal([]byte(r), &response); err != nil {
+							 fmt.Println("error decoding response message: %v\n", err)
+							}
+						case <-time.After(wac.msgTimeout):
+							 fmt.Println("rrr request timed out")
+						}
+						//
+						// if int(response["status"].(float64)) != 200 {
+						// 	fmt.Errorf("request responded with %d", response["status"])
+						// }
+		return ch,err
 
 }
 //         // data := []interface{}{"Chat", map[string]interface{}{
@@ -117,44 +105,6 @@ func (wac *Conn) CloseGroup(jid, userID string, close bool) (<-chan string, erro
 // fmt.Println(response)
 // 				return response["code"].(string), nil
 // }
-
-func (wac *Conn) OpenGroup(jid, userID string, close bool) (<-chan string, error) {
-
-		ts := time.Now().Unix()
-		tag := fmt.Sprintf("%d.--%d", ts, wac.msgCount)
-		fmt.Println("inside")
-
-		//TODO: get proto or improve encoder to handle []interface{}
-		//
-		// p := buildParticipantNodes(participants)
-
-		fmt.Println("inside")
-		g := binary.Node{
-			Description: "group",
-			Attributes: map[string]string{
-				"author": wac.session.Wid,
-				"id":     tag,
-				"type":   "announce",
-				"jid": jid,
-				"announce": strconv.FormatBool(close),
-			},
-			Content: nil,
-		}
-		fmt.Println("inside")
-
-		n := binary.Node{
-			Description: "action",
-			Attributes: map[string]string{
-				"type":  "set",
-				"epoch": strconv.Itoa(wac.msgCount),
-			},
-			Content: []interface{}{g},
-		}
-		fmt.Println("inside")
-
-		return wac.writeBinary(n, group, ignore, tag)
-}
-
 
 func (wac *Conn) CreateGroup(subject string, participants []string) (<-chan string, error) {
 	return wac.setGroup("create", "", subject, participants)
